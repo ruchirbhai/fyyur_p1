@@ -13,6 +13,12 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
+
+## why are the below 2 imports needed??
+# from flask_script import Manager
+# from flask_migrate import Migrate, MigrateCommand
+# from sqlalchemy.orm.exc import NoResultFound
+
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
@@ -20,67 +26,25 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
 
+# Move this to the models.py
+#db = SQLAlchemy(app)
+
+db.init_app(app)
 # Add db migrate
 migrate = Migrate(app, db)
+
+# # Are these 3 needed??
+# db.init_app(app)
+# manager = Manager(app)
+# manager.add_command('db', MigrateCommand)
 
 # DONE !! TODO: connect to a local postgresql database
 
 # ----------------------------------------------------------------------------#
-# Models.
+# Models in models.py
 # ----------------------------------------------------------------------------#
 
-
-class Venue(db.Model):
-    __tablename__ = 'Venue'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    # Adding genres
-    genres = db.Column(db.ARRAY(db.String))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    # Adding website link
-    website_link = db.Column(db.String(500))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    # Adding seeking fields
-    seeking_talent = db.Column(db.Boolean, nullable=False, default=True)
-    seeking_description = db.Column(db.String(120))
-    #  This gets its own table this is getting complicated
-    #  Adding past shows array
-    # past_shows = db.Column(db.ARRAY(db.String))
-    # upcoming_shows = db.Column(db.ARRAY(db.String))
-    # past_shows_count = db.Column(db.String(120))
-    # upcoming_shows_count = db.Column(db.String(120))
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-
-class Artist(db.Model):
-    __tablename__ = 'Artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    # Adding missing fields
-    website_link = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean, nullable=False, default=True)
-    seeking_description = db.Column(db.String(120))
-    #  This gets its own table this is getting complicated
-    #  Adding past shows array
-    # past_shows = db.Column(db.ARRAY(db.String))
-    # upcoming_shows = db.Column(db.ARRAY(db.String))
-    # past_shows_count = db.Column(db.String(120))
-    # upcoming_shows_count = db.Column(db.String(120))
 
 
 # Done!! TODO: implement any missing fields, as a database migration using Flask-Migrate
