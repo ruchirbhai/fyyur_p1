@@ -35,7 +35,7 @@ class Venue(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    #How does this work? Why is it needed?
+    # How does this work? Why is it needed?
     def __repr__(self):
         return '<Venue %r>' % self
 
@@ -55,7 +55,7 @@ class Venue(db.Model):
                 'seeking_talent': self.seeking_talent,
                 'seeking_description': self.seeking_description
                 }
-    
+
     @property
     def serialize_with_upcoming_shows_count(self):
         return {'id': self.id,
@@ -86,7 +86,7 @@ class Venue(db.Model):
                 'facebook_link': self.facebook_link,
                 'seeking_talent': self.seeking_talent,
                 'seeking_description': self.seeking_description,
-                'website': self.website,
+                'website': self.website_link,
                 'upcoming_shows': [show.serialize_with_artist_venue for show in Show.query.filter(
                     Show.start_time > datetime.datetime.now(),
                     Show.venue_id == self.id).all()],
