@@ -13,8 +13,9 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
+from models import db, Artist, Venue
 
-## why are the below 2 imports needed??
+# why are the below 2 imports needed??
 # from flask_script import Manager
 # from flask_migrate import Migrate, MigrateCommand
 # from sqlalchemy.orm.exc import NoResultFound
@@ -26,10 +27,6 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-
-# Move this to the models.py
-#db = SQLAlchemy(app)
-
 db.init_app(app)
 # Add db migrate
 migrate = Migrate(app, db)
@@ -44,13 +41,11 @@ migrate = Migrate(app, db)
 # ----------------------------------------------------------------------------#
 # Models in models.py
 # ----------------------------------------------------------------------------#
-
-
-
-# Done!! TODO: implement any missing fields, as a database migration using Flask-Migrate
+#  Done!! TODO: implement any missing fields, as a database migration using 
+# Flask-Migrate
 # db.create_all()
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+# TODO Implement Show and Artist models, and complete all model relationships
+# and properties, as a database migration.
 
 
 class Show_Venue(db.Model):
@@ -65,8 +60,6 @@ class Show_Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     show_artist = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-
-
 # ----------------------------------------------------------------------------#
 # Filters.
 # ----------------------------------------------------------------------------#
@@ -75,10 +68,11 @@ class Show_Artist(db.Model):
 def format_datetime(value, format='medium'):
     date = dateutil.parser.parse(value)
     if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
+        format = "EEEE MMMM, d, y 'at' h:mma"
     elif format == 'medium':
-      format="EE MM, dd, y h:mma"
+        format = "EE MM, dd, y h:mma"
     return babel.dates.format_datetime(date, format)
+
 
 app.jinja_env.filters['datetime'] = format_datetime
 
@@ -293,81 +287,62 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
+    artist = Artist.query.filter(Artist.id == artist_id).one_or_none()
+
+    if artist is None:
+          abort(404)
+    
+    data = artist.serialize_with_shows_details
+    
+    return render_template('pages/show_artist.html', artist=data)
+
     # shows the venue page with the given venue_id
     # TODO: replace with real venue data from the venues table, using venue_id
-    data1={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-    "past_shows": [{
-      "venue_id": 1,
-      "venue_name": "The Musical Hop",
-      "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
-    }
-    data2={
-    "id": 5,
-    "name": "Matt Quevedo",
-    "genres": ["Jazz"],
-    "city": "New York",
-    "state": "NY",
-    "phone": "300-400-5000",
-    "facebook_link": "https://www.facebook.com/mattquevedo923251523",
-    "seeking_venue": False,
-    "image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-    "past_shows": [{
-      "venue_id": 3,
-      "venue_name": "Park Square Live Music & Coffee",
-      "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-      "start_time": "2019-06-15T23:00:00.000Z"
-    }],
-    "upcoming_shows": [],
-    "past_shows_count": 1,
-    "upcoming_shows_count": 0,
-    }
-    data3={
-    "id": 6,
-    "name": "The Wild Sax Band",
-    "genres": ["Jazz", "Classical"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "432-325-5432",
-    "seeking_venue": False,
-    "image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "past_shows": [],
-    "upcoming_shows": [{
-      "venue_id": 3,
-      "venue_name": "Park Square Live Music & Coffee",
-      "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-      "start_time": "2035-04-01T20:00:00.000Z"
-    }, {
-      "venue_id": 3,
-      "venue_name": "Park Square Live Music & Coffee",
-      "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-      "start_time": "2035-04-08T20:00:00.000Z"
-    }, {
-      "venue_id": 3,
-      "venue_name": "Park Square Live Music & Coffee",
-      "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
-      "start_time": "2035-04-15T20:00:00.000Z"
-    }],
-    "past_shows_count": 0,
-    "upcoming_shows_count": 3,
-    }
-    data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
-    return render_template('pages/show_artist.html', artist=data)
+    # data1={
+    #   "past_shows": [{
+    #   "venue_id": 1,
+    #   "venue_name": "The Musical Hop",
+    #   "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
+    #   "start_time": "2019-05-21T21:30:00.000Z"
+    # }],
+    # "upcoming_shows": [],
+    # "past_shows_count": 1,
+    # "upcoming_shows_count": 0,
+    # }
+    # data2={
+    # "past_shows": [{
+    #   "venue_id": 3,
+    #   "venue_name": "Park Square Live Music & Coffee",
+    #   "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
+    #   "start_time": "2019-06-15T23:00:00.000Z"
+    # }],
+    # "upcoming_shows": [],
+    # "past_shows_count": 1,
+    # "upcoming_shows_count": 0,
+    # }
+    # data3={
+    # "seeking_venue": False,
+    # "past_shows": [],
+    # "upcoming_shows": [{
+    #   "venue_id": 3,
+    #   "venue_name": "Park Square Live Music & Coffee",
+    #   "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
+    #   "start_time": "2035-04-01T20:00:00.000Z"
+    # }, {
+    #   "venue_id": 3,
+    #   "venue_name": "Park Square Live Music & Coffee",
+    #   "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
+    #   "start_time": "2035-04-08T20:00:00.000Z"
+    # }, {
+    #   "venue_id": 3,
+    #   "venue_name": "Park Square Live Music & Coffee",
+    #   "venue_image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80",
+    #   "start_time": "2035-04-15T20:00:00.000Z"
+    # }],
+    # "past_shows_count": 0,
+    # "upcoming_shows_count": 3,
+    # }
+
 
 
 #  Update
