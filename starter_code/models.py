@@ -44,14 +44,14 @@ class Venue(db.Model):
     def serialize(self):
         return {'id': self.id,
                 'name': self.name,
-                'genres': self.genres.split(','),
+                'genres': self.genres,
                 'city': self.city,
                 'state': self.state,
                 'phone': self.phone,
                 'address': self.address,
                 'image_link': self.image_link,
                 'facebook_link': self.facebook_link,
-                'website': self.website,
+                'website': self.website_link,
                 'seeking_talent': self.seeking_talent,
                 'seeking_description': self.seeking_description
                 }
@@ -66,7 +66,7 @@ class Venue(db.Model):
                 'address': self.address,
                 'image_link': self.image_link,
                 'facebook_link': self.facebook_link,
-                'website': self.website,
+                'website_link': self.website_link,
                 'seeking_talent': self.seeking_talent,
                 'seeking_description': self.seeking_description,
                 'num_shows': Show.query.filter(
@@ -82,6 +82,7 @@ class Venue(db.Model):
                 'state': self.state,
                 'phone': self.phone,
                 'address': self.address,
+                'genres': self.genres,
                 'image_link': self.image_link,
                 'facebook_link': self.facebook_link,
                 'seeking_talent': self.seeking_talent,
@@ -151,7 +152,7 @@ class Artist(db.Model):
                 'facebook_link': self.facebook_link,
                 'seeking_venue': self.seeking_venue,
                 'seeking_description': self.seeking_description,
-                'website': self.website_link,
+                'website_link': self.website_link,
                 'upcoming_shows': [show.serialize_with_artist_venue for show in Show.query.filter(
                     Show.start_time > datetime.datetime.now(),
                     Show.artist_id == self.id).all()],
