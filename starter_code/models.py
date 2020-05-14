@@ -28,7 +28,7 @@ class Venue(db.Model):
         db.session.commit()
 
     def update(self):
-        db.session.update(self)
+        # db.session.update(self)
         db.session.commit()
 
     def delete(self):
@@ -133,7 +133,6 @@ class Artist(db.Model):
         db.session.commit()
 
     def update(self):
-        db.session.update(self)
         db.session.commit()
 
     def delete(self):
